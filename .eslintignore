@@ -1,0 +1,3 @@
+node_modules
+dist
+/frontend_test/node_modules

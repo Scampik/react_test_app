@@ -1,0 +1,8 @@
+/node_modules/
+dist
+build
+/public/
+/src/App.test.js
+/src/reportWebVitals.js
+.eslintrc.yml
+./.eslintrc.yml
