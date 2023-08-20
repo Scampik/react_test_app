@@ -1,30 +1,24 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import { PlusSquare } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
+
 import {
   actions as channelsActions,
-  getChannels,
   selectors,
-} from '../slices/channelsSlice.js';
-import { isOpen } from '../slices/modalSlice.js';
-
-import getModal from './modals/index.jsx';
-import Channels from './Channels.jsx';
+  currentChannelSelector,
+} from '../../../slices/channelsSlice.js';
+import { isOpen } from '../../../slices/modalsSlice.js';
+import ModalForm from '../modals/index.jsx';
+import UserChannel from './UserChannel.jsx';
 
 const ChannelForm = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
+  const currentChannel = useSelector(currentChannelSelector);
   const channels = useSelector(selectors.selectAll);
-  const { currentChannel } = useSelector((state) => state.channels);
-  const { type } = useSelector((state) => state.modalInfo);
-
-  useEffect(() => {
-    dispatch(getChannels());
-  }, [dispatch]);
 
   const handleAddChannel = () => {
     dispatch(isOpen({ type: 'adding', extraData: '' }));
@@ -55,7 +49,7 @@ const ChannelForm = () => {
   );
 
   const renderUsersChannels = (channel) => (
-    <Channels
+    <UserChannel
       handleCurrenChannel={handleCurrenChannel(channel)}
       handleRemoveChannel={handleRemoveChannel(channel)}
       handleRenameChannel={handleRenameChannel(channel)}
@@ -75,7 +69,7 @@ const ChannelForm = () => {
           <PlusSquare width="22" height="22" />
           <span className="visually-hidden">+</span>
         </button>
-        {getModal({ type })}
+        <ModalForm />
       </div>
       <ul
         id="channels-box"

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Form, Button } from 'react-bootstrap';
@@ -6,8 +5,11 @@ import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import filter from 'leo-profanity';
 import * as Yup from 'yup';
-import { selectors } from '../slices/messagesSlice.js';
-import { useWSocket, useAuth } from '../hooks/index.jsx';
+
+import { selectors } from '../../../slices/messagesSlice.js';
+import { useAuth } from '../../../hooks/AuthContext.jsx';
+import { currentChannelSelector } from '../../../slices/channelsSlice.js';
+import { useWSocket } from '../../../hooks/WScontext.jsx';
 
 const ChatForm = () => {
   const auth = useAuth();
@@ -15,11 +17,10 @@ const ChatForm = () => {
   const wsocket = useWSocket();
   const { t } = useTranslation();
 
-  const { currentChannel } = useSelector((state) => state.channels);
+  const currentChannel = useSelector(currentChannelSelector);
   const allMessages = useSelector(selectors.selectAll);
   const messages = allMessages.filter((el) => el.channelId === currentChannel.id);
-  const userId = JSON.parse(localStorage.getItem('userId'));
-  console.log(auth.userName);
+  const userId = auth.userName;
 
   useEffect(() => {
     inputRef.current.focus();
@@ -65,6 +66,7 @@ const ChatForm = () => {
               <div key={mess.id} className="text-break mb-2">
                 <b>{mess.username}</b>
                 :
+                {' '}
                 {mess.body}
               </div>
             ))}

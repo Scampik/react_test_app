@@ -1,8 +1,8 @@
 import { Provider } from 'react-redux';
 import i18next from 'i18next';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-// import { Provider as ProviderRoll, ErrorBoundary } from '@rollbar/react';
-// import Rollbar from "rollbar";
+import { Provider as ProviderRoll, ErrorBoundary } from '@rollbar/react';
+import Rollbar from 'rollbar';
 import React from 'react';
 import filter from 'leo-profanity';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,15 +11,15 @@ import { actions as channelsActions } from './slices/channelsSlice.js';
 import { actions as messagesActions } from './slices/messagesSlice.js';
 import store from './slices/index';
 import App from './components/App';
-import WSocketProvider from './contexts/WScontext';
-import AuthProvider from './contexts/AuthContext';
+import AuthProvider from './hooks/AuthContext';
+import WSocketProvider from './hooks/WScontext';
 import resources from './locales/index.js';
 
 const init = async (socket) => {
   const i18n = i18next.createInstance();
 
   await i18n
-    .use(initReactI18next) // passes i18n down to react-i18next
+    .use(initReactI18next)
     .init({
       resources,
       lng: 'ru',
@@ -58,26 +58,31 @@ const init = async (socket) => {
     );
   });
 
-  // const rollbarConfig = {
-  //   accessToken: process.env.REACT_APP_ROLLBAR_TOKEN,
-  //   captureUncaught: true,
-  //   captureUnhandledRejections: true,
-  //   environment: 'production',
-  // };
-  // const rollbar = new Rollbar(rollbarConfig);
-  // config={rollbarConfig} v Proveder
-  // <ProviderRoll config={rollbarConfig}>
-  // <ErrorBoundary>
+  const rollbarConfig = {
+    accessToken: process.env.REACT_APP_ROLLBAR_TOKEN,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+    environment: 'production',
+  };
+
+  const rollbar = new Rollbar(rollbarConfig);
+
   return (
-    <Provider store={store}>
-      <WSocketProvider socket={socket}>
-        <AuthProvider>
-          <I18nextProvider i18n={i18n}>
-            <App />
-          </I18nextProvider>
-        </AuthProvider>
-      </WSocketProvider>
-    </Provider>
+    <React.StrictMode>
+      <ProviderRoll config={rollbar}>
+        <ErrorBoundary>
+          <Provider store={store}>
+            <WSocketProvider socket={socket}>
+              <AuthProvider>
+                <I18nextProvider i18n={i18n}>
+                  <App />
+                </I18nextProvider>
+              </AuthProvider>
+            </WSocketProvider>
+          </Provider>
+        </ErrorBoundary>
+      </ProviderRoll>
+    </React.StrictMode>
   );
 };
 

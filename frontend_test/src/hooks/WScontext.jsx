@@ -1,8 +1,9 @@
 /* eslint-disable */
 
-import React, { createContext } from 'react';
+import React, { createContext, useContext } from 'react';
 
-export const WSocketContext = createContext(null);
+const WSocketContext = createContext(null);
+export const useWSocket = () => useContext(WSocketContext);
 
 const WSocketProvider = ({ socket, children }) => {
   const emitNewMessage = (msg) =>

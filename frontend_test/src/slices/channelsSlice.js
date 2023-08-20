@@ -1,5 +1,3 @@
-/* eslint-disable functional/no-conditional-statements */
-/* eslint-disable functional/no-return-void */
 /* eslint-disable no-param-reassign */
 
 import {
@@ -8,21 +6,15 @@ import {
   createAsyncThunk,
 } from '@reduxjs/toolkit';
 import axios from 'axios';
-import routes from '../routes.js';
+import { createSelector } from 'reselect';
 
-const getAuthHeader = () => {
-  const userId = JSON.parse(localStorage.getItem('userId'));
-  if (userId && userId.token) {
-    return { Authorization: `Bearer ${userId.token}` };
-  }
-  return {};
-};
+import routes from '../routes.js';
 
 export const getChannels = createAsyncThunk(
   'channels/getChannels',
-  async () => {
+  async (authHeader) => {
     const { data } = await axios.get(routes.dataPath(), {
-      headers: getAuthHeader(),
+      headers: authHeader,
     });
     return data;
   },
@@ -67,4 +59,9 @@ const channelsSlice = createSlice({
 
 export default channelsSlice.reducer;
 export const selectors = channelsAdapter.getSelectors((state) => state.channels);
+export const channelsSelector = (state => state.channels);
+export const currentChannelSelector = createSelector(
+  channelsSelector,
+  (channels => channels.currentChannel),
+);
 export const { actions } = channelsSlice;
